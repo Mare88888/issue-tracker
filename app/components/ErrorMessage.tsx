@@ -1,11 +1,8 @@
 import { Text } from '@radix-ui/themes';
 import React, { ReactNode } from 'react'
 
-interface Props {
-    children: ReactNode;
-}
 
-const ErrorMessage = ({ children }: Props) => {
+const ErrorMessage = ({ children }: { children: ReactNode }) => {
     if (!children) return null;
     return (
         <Text color="red" as="p">{children}</Text>
