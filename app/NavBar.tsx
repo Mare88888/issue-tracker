@@ -13,7 +13,7 @@ const NavBar = () => {
         href: "/",
     }, {
         label: "Issues",
-        href: "/issues",
+        href: "/issues/list",
     }]
 
     return (
