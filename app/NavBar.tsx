@@ -7,6 +7,7 @@ import classnames from 'classnames';
 import { useSession } from 'next-auth/react';
 import { Avatar, Box, Container, DropdownMenu, Flex } from '@radix-ui/themes';
 import { Text } from '@radix-ui/themes';
+import { Skeleton } from '@/app/components';
 
 const NavBar = () => {
     return (
@@ -26,7 +27,7 @@ const NavBar = () => {
 
 const AuthStatus = () => {
     const { status, data: session } = useSession();
-    if (status === "loading") return null;
+    if (status === "loading") return <Skeleton width="3rem" />;
 
     if (status === "unauthenticated")
         return <Link href="/api/auth/signin" className="text-zinc-500 dark:text-zinc-300 hover:text-zinc-800 dark:hover:text-zinc-50 transition-colors">Login</Link>
