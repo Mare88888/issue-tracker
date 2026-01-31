@@ -1,5 +1,6 @@
 "use client"
 import { Select } from '@radix-ui/themes'
+import { useRouter } from 'next/navigation';
 
 
 const ALL_STATUS = "__all__";
@@ -12,8 +13,14 @@ const statuses: { label: string; value: string }[] = [
 ];
 
 const IssueStatusFilter = () => {
+    const router = useRouter();
     return (
-        <Select.Root>
+        <Select.Root onValueChange={(status) => {
+            const params = new URLSearchParams();
+            if (status && status !== ALL_STATUS) params.set("status", status);
+            const query = params.toString() ? "?" + params.toString() : "";
+            router.push("/issues/list" + query);
+        }}>
             <Select.Trigger placeholder="Filter by status..." />
             <Select.Content>
                 {statuses.map((status) => (
