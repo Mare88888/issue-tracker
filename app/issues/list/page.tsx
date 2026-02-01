@@ -2,19 +2,33 @@ import prisma from '@/prisma/client';
 import { Table } from '@radix-ui/themes';
 import { Link, IssueStatusBadge } from "@/app/components"
 import IssueActions from './IssueActions';
-import { Status } from '@prisma/client';
+import { Issue, Status } from '@prisma/client';
+import { Oi } from 'next/font/google';
+import NextLink from 'next/link';
+import { ArrowUpIcon } from '@radix-ui/react-icons';
+
+const columns: { label: string; value: keyof Issue; className?: string }[] = [
+    { label: "Issue", value: "title" },
+    { label: "Status", value: "status", className: "hidden md:table-cell" },
+    { label: "Created", value: "createdAt", className: "hidden md:table-cell" },
+];
 
 interface Props {
-    searchParams: Promise<{ status: Status }>;
+    searchParams: Promise<{ status?: Status; orderBy?: keyof Issue; order?: string }>;
 }
 
 const IssuesPage = async ({ searchParams }: Props) => {
-
+    const params = await searchParams;
     const statuses = Object.values(Status);
-    const status = statuses.includes((await searchParams).status) ? (await searchParams).status : undefined;
+    const status = params.status && statuses.includes(params.status) ? params.status : undefined;
+    const orderBy = (params.orderBy === "title" || params.orderBy === "status" || params.orderBy === "createdAt")
+        ? params.orderBy
+        : "createdAt";
+    const order = params.order === "desc" ? "desc" : "asc";
 
     const issues = await prisma.issue.findMany({
-        where: { status: status }
+        where: status ? { status } : undefined,
+        orderBy: { [orderBy]: order },
     });
 
     return (
@@ -23,9 +37,19 @@ const IssuesPage = async ({ searchParams }: Props) => {
             <Table.Root variant="surface">
                 <Table.Header>
                     <Table.Row>
-                        <Table.ColumnHeaderCell>Issue</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell className="hidden md:table-cell">Status</Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell className="hidden md:table-cell">Created</Table.ColumnHeaderCell>
+                        {columns.map(column => {
+                            const nextOrder = orderBy === column.value && order === "asc" ? "desc" : "asc";
+                            const q = new URLSearchParams();
+                            if (status) q.set("status", status);
+                            q.set("orderBy", column.value);
+                            q.set("order", nextOrder);
+                            return (
+                                <Table.ColumnHeaderCell key={column.value}>
+                                    <NextLink href={`/issues/list?${q.toString()}`}>{column.label}</NextLink>
+                                    {column.value === orderBy && <ArrowUpIcon style={{ transform: order === "desc" ? "rotate(180deg)" : undefined }} />}
+                                </Table.ColumnHeaderCell>
+                            );
+                        })}
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
