@@ -44,7 +44,7 @@ const IssuesPage = async ({ searchParams }: Props) => {
                             q.set("orderBy", column.value);
                             q.set("order", nextOrder);
                             return (
-                                <Table.ColumnHeaderCell key={column.value}>
+                                <Table.ColumnHeaderCell key={column.value} className={column.className}>
                                     <NextLink href={`/issues/list?${q.toString()}`}>{column.label}</NextLink>
                                     {column.value === orderBy && <ArrowUpIcon style={{ transform: order === "desc" ? "rotate(180deg)" : undefined }} />}
                                 </Table.ColumnHeaderCell>
